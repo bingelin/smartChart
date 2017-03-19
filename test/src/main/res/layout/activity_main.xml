@@ -18,6 +18,7 @@
             android:padding="5dp"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:digits="0123456789"
             android:layout_weight="1"/>
 
         <EditText
@@ -25,7 +26,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:padding="5dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:digits="0123456789"/>
 
         <Button
             android:id="@+id/main_bt_add"
@@ -35,5 +37,12 @@
             android:text="Add"/>
 
     </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_rv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+    </android.support.v7.widget.RecyclerView>
 
 </LinearLayout>
