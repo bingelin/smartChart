@@ -7,9 +7,18 @@ import org.litepal.crud.DataSupport;
  */
 
 public class Coordinate extends DataSupport{
-    String id;
     String x;
     String y;
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    String time;
 
     public String getX() {
         return x;

@@ -15,10 +15,9 @@ import android.widget.Toast;
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.litepal.crud.DataSupport.findAll;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,14 +34,21 @@ public class MainActivity extends AppCompatActivity {
 
     private SQLiteDatabase db = LitePal.getDatabase();
 
+    private String str_time ;
+
+    private boolean isFirst = true; //判断是否是第一次进入并且成功创建表
+
+    private List<Coordinate> queryData = new ArrayList<>();
+
 
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         initView();
+
+
 
         myAdapter = new MyAdapter(this, list_x, list_y);
         mRecycler.setAdapter(myAdapter);
@@ -51,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         bt_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 str_x = et_x.getText().toString();
                 str_y = et_y.getText().toString();
                 if (isAllEmpty(str_x, str_y)) {
@@ -62,12 +69,30 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "y值不能为空", Toast.LENGTH_SHORT).show();
                     } else if (!isAllEmpty(str_x, str_y)) {
 
-                        myAdapter.addItem(str_x, str_y);
+                        if (isFirst) {
+                            str_time = getSystemTime();
+                            Toast.makeText(MainActivity.this, str_time, Toast.LENGTH_SHORT).show();
+                            CreateTime createTime = new CreateTime();
+                            createTime.setTime(str_time);
+                            createTime.save();
+                            isFirst = false;
+                        }
+
 
                         Coordinate coordinate = new Coordinate();
                         coordinate.setX(str_x);
                         coordinate.setY(str_y);
-                        coordinate.save();
+                        coordinate.setTime(str_time);
+                        coordinate.saveThrows();
+//                        if (coordinate.save()) {
+//                            Toast.makeText(MainActivity.this, "创建成功", Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            Toast.makeText(MainActivity.this, "创建不成功", Toast.LENGTH_SHORT).show();
+//                        }
+                        
+                        myAdapter.addItem(str_x, str_y);
+
+
                     }
                 }
             }
@@ -88,12 +113,27 @@ public class MainActivity extends AppCompatActivity {
                         .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-
+                                queryData = DataSupport.findAll(Coordinate.class);
+                                toast(queryData);
                             }
                         }).show();
             }
         });
 
+    }
+
+    public void toast(List<Coordinate> list_time) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < list_time.size(); i++) {
+            sb.append(list_time.get(i).getX() + "\n");
+        }
+        Toast.makeText(MainActivity.this, sb, Toast.LENGTH_SHORT).show();
+    }
+
+    private String getSystemTime() {
+        SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy-MM-dd    hh:mm:ss");
+        String date = sDateFormat.format(new java.util.Date());
+        return date;
     }
 
     private void initView() {
@@ -106,21 +146,14 @@ public class MainActivity extends AppCompatActivity {
         list_y = new ArrayList<>();
 
 
-        List<Coordinate> list = findAll(Coordinate.class);
 
-        for (int i = 0; i < list.size(); i++) {
-            list_x.add(list.get(i).getX());
-            list_y.add(list.get(i).getY());
-        }
 
-//        StringBuffer s = new StringBuffer();
+//        List<Coordinate> list = findAll(Coordinate.class);
+//
 //        for (int i = 0; i < list.size(); i++) {
-//            s.append("(" + list.get(i).getX() + "," + list.get(i).getY() + ")"+"\n");
+//            list_x.add(list.get(i).getX());
+//            list_y.add(list.get(i).getY());
 //        }
-//        Toast.makeText(MainActivity.this, s, Toast.LENGTH_SHORT).show();
-
-
-
 
     }
 
@@ -134,5 +167,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return false;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myAdapter.removeAll();
     }
 }

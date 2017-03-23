@@ -71,6 +71,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
         this.notifyDataSetChanged();
     }
 
+    public void removeAll() {
+        if (list_x.size() > 0) {
+            this.notifyItemRangeRemoved(0, getItemCount());
+        }
+    }
+
 
     public void setOnItemClickListener(ItemClickListener listener) {
         this.listener = listener;
@@ -85,7 +91,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             llayout = (LinearLayout) itemView.findViewById(R.id.item_llayout);
             tv_x = (TextView) itemView.findViewById(R.id.item_tv_x);
             tv_y = (TextView) itemView.findViewById(R.id.item_tv_y);
-
         }
     }
 
